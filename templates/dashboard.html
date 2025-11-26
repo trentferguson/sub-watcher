@@ -1,183 +1,124 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Subreddit Watcher Dashboard</title>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            margin: 20px;
-            background: #0f172a;
-            color: #e5e7eb;
-        }
+    <!-- Tailwind Play CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-        h1 {
-            margin-bottom: 0.2rem;
-        }
+    <!-- Optional: Add daisyUI if you like its semantic classes and themes -->
+    <!--
+  <script>
+    // Only works if you build with Tailwind + daisyUI; for Play CDN quick prototyping you can style manually.
+  </script>
+  -->
 
-        .subtitle {
-            margin-top: 0;
-            margin-bottom: 1rem;
-            color: #9ca3af;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-        }
-
-        th,
-        td {
-            padding: 8px 10px;
-            border-bottom: 1px solid #1f2937;
-            vertical-align: top;
-        }
-
-        th {
-            background: #111827;
-            position: sticky;
-            top: 0;
-            z-index: 1;
-        }
-
-        tr:nth-child(even) {
-            background: #020617;
-        }
-
-        tr:nth-child(odd) {
-            background: #020617;
-        }
-
-        a {
-            color: #93c5fd;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .controls {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            margin-top: 0.5rem;
-        }
-
-        label {
-            font-size: 0.85rem;
-            color: #9ca3af;
-        }
-
-        select,
-        input[type="number"] {
-            background: #020617;
-            color: #e5e7eb;
-            border: 1px solid #374151;
-            border-radius: 4px;
-            padding: 4px 6px;
-        }
-
-        button {
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 6px 10px;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-
-        button:hover {
-            background: #1d4ed8;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            gap: 1rem;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type="text/tailwindcss">
+        /* You can add extra Tailwind-based customizations here if needed */
+  </style>
 </head>
 
-<body>
-    <div class="top-bar">
-        <div>
-            <h1>Subreddit Watcher Dashboard</h1>
-            <p class="subtitle">
-                Showing the {{ posts|length }} most recent matched posts
-                {% if selected_subreddit %}
-                for r/{{ selected_subreddit }}
-                {% endif %}.
-            </p>
-        </div>
-    </div>
+<body class="bg-slate-900 text-slate-200 min-h-screen flex flex-col">
 
-    <form method="get" class="controls">
-        <div>
-            <label for="subreddit">Subreddit:</label>
-            <select name="subreddit" id="subreddit">
-                <option value="">All</option>
-                {% for s in subreddits %}
-                <option value="{{ s }}" {% if selected_subreddit==s %}selected{% endif %}>
-                    {{ s }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-        <div>
-            <label for="limit">Limit:</label>
-            <input type="number" id="limit" name="limit" min="1" max="500" value="{{ limit }}">
-        </div>
-        <div>
-            <button type="submit">Apply</button>
-        </div>
-    </form>
+    <header class="bg-slate-800/80 backdrop-blur-sm sticky top-0 z-20">
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+                <h1 class="text-2xl font-semibold">Subreddit Watcher Dashboard</h1>
+                <p class="text-sm text-slate-400 mt-0.5">
+                    Showing the {{ posts|length }} most recent matched posts
+                    {% if selected_subreddit %}for r/{{ selected_subreddit }}{% endif %}.
+                </p>
+            </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Subreddit</th>
-                <th>Flair</th>
-                <th>Score</th>
-                <th>Created (UTC)</th>
-                <th>Title</th>
-                <th>Matched At</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if posts %}
-            {% for p in posts %}
-            <tr>
-                <td>{{ p.id }}</td>
-                <td>{{ p.subreddit }}</td>
-                <td>{{ p.flair or '' }}</td>
-                <td>{{ p.score if p.score is not none else '' }}</td>
-                <td>{{ p.created_utc if p.created_utc is not none else '' }}</td>
-                <td>
-                    {% if p.url %}
-                    <a href="{{ p.url }}" target="_blank">
-                        {{ p.title }}
-                    </a>
-                    {% else %}
-                    {{ p.title }}
-                    {% endif %}
-                </td>
-                <td>{{ p.matched_at }}</td>
-            </tr>
-            {% endfor %}
-            {% else %}
-            <tr>
-                <td colspan="7">No posts found.</td>
-            </tr>
-            {% endif %}
-        </tbody>
-    </table>
+            <form method="get" class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div class="flex flex-col">
+                    <label for="subreddit" class="text-xs text-slate-400 mb-1">Subreddit</label>
+                    <select name="subreddit" id="subreddit"
+                        class="bg-slate-700 text-slate-200 border border-slate-600 rounded-md px-2 py-1 text-sm">
+                        <option value="">All</option>
+                        {% for s in subreddits %}
+                        <option value="{{ s }}" {% if selected_subreddit==s %}selected{% endif %}>
+                            {{ s }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="flex flex-col">
+                    <label for="limit" class="text-xs text-slate-400 mb-1">Limit</label>
+                    <input type="number" id="limit" name="limit" min="1" max="500" value="{{ limit }}"
+                        class="bg-slate-700 text-slate-200 border border-slate-600 rounded-md px-2 py-1 text-sm w-20" />
+                </div>
+
+                <div class="pt-1 sm:pt-4">
+                    <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 text-white rounded-md px-4 py-2 text-sm">
+                        Apply
+                    </button>
+                </div>
+            </form>
+        </div>
+    </header>
+
+    <main class="flex-grow overflow-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="overflow-x-auto rounded-lg shadow-md border border-slate-700">
+                <table class="min-w-full divide-y divide-slate-700">
+                    <thead class="bg-slate-800">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">ID</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Subreddit</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Flair</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Score</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Created (UTC)
+                            </th>
+                            <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Title</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Matched At</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-slate-900 divide-y divide-slate-700 text-sm">
+                        {% if posts %}
+                        {% for p in posts %}
+                        <tr class="hover:bg-slate-800">
+                            <td class="px-4 py-2 whitespace-nowrap">{{ p.id }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap">{{ p.subreddit }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap">{{ p.flair or '' }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap">{{ p.score if p.score is not none else '' }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap">{{ p.created_utc if p.created_utc is not none else
+                                '' }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap">
+                                {% if p.url %}
+                                <a href="{{ p.url }}" target="_blank" class="text-blue-400 hover:underline break-all">
+                                    {{ p.title }}
+                                </a>
+                                {% else %}
+                                {{ p.title }}
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-2 whitespace-nowrap">{{ p.matched_at }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="px-4 py-6 text-center text-slate-400">
+                                No posts found.
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-800/80 text-xs text-slate-500 text-center py-2">
+        <!-- Optional: add small footer or version info -->
+        Subreddit Watcher &bull; Powered by your Python backend
+    </footer>
+
 </body>
 
 </html>
