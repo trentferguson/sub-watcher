@@ -1,0 +1,6 @@
+requests
+PyYAML
+SQLAlchemy
+fastapi
+uvicorn[standard]
+jinja2

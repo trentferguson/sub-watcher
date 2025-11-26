@@ -1,0 +1,71 @@
+# ----------------------------
+# Python
+# ----------------------------
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Installed packages
+**/*.egg-info/
+dist/
+build/
+
+# Byte-compiled
+*.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+
+# ----------------------------
+# Project-specific files
+# ----------------------------
+
+# SQLite database files
+history.db
+seen_posts.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# Startup-state tracking (legacy JSON)
+seen.json
+
+# Config overrides (if you ever separate prod/dev configs)
+config.yaml
+config.local.yaml
+config.secrets.yaml
+
+# Docker
+*.pid
+docker-compose.override.yml
+
+# ----------------------------
+# IDE / Editor Files
+# ----------------------------
+
+# VS Code
+.vscode/
+.history/
+
+# JetBrains
+.idea/
+
+# ----------------------------
+# OS Files
+# ----------------------------
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db

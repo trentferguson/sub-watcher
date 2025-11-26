@@ -1,0 +1,95 @@
+# =====================================================
+# Subreddit Watcher – Example Configuration
+# =====================================================
+# Copy this file to `config.yaml` and fill in your secrets.
+# Do NOT commit `config.yaml` if it contains real API keys.
+# =====================================================
+
+# ----------------------------
+# Notification settings
+# ----------------------------
+pushover:
+  api_token: "YOUR_API_TOKEN_HERE"
+  user_key: "YOUR_USER_KEY_HERE"
+
+# ----------------------------
+# Startup behavior
+# ----------------------------
+# When true, the app will fetch recent posts for each
+# subreddit on startup and mark their post_ids as "seen"
+# in the database so they do NOT trigger notifications.
+mark_existing_as_seen_on_startup: true
+
+# ----------------------------
+# Logging level
+# Options: DEBUG, INFO, WARNING, ERROR
+# ----------------------------
+log_level: "INFO"
+
+# ----------------------------
+# Global watcher interval
+# If omitted or invalid, the lowest per-subreddit interval
+# will be used instead.
+# ----------------------------
+global_loop_interval_seconds: 60
+
+# ----------------------------
+# Subreddit configurations
+# ----------------------------
+subreddits:
+
+  # ---------------------------------------------------
+  # Example: r/selfhosted
+  # ---------------------------------------------------
+  - name: "selfhosted"
+
+    # Check interval for this subreddit
+    # (Overrides global_loop_interval_seconds for this sub)
+    interval: 30
+
+    # Keywords to require in title (case-insensitive)
+    # Leave empty to match ALL posts
+    keywords: []
+
+    # Regex patterns that should cause a post to be ignored
+    ignore_title_regex: []
+
+    # Regex patterns that must be present to match
+    require_title_regex: []
+
+    # Minimum score required to match a post
+    min_score: null
+
+    # Only match posts with one of these flairs
+    # Leave empty to allow any flair
+    allowed_flairs: []
+
+    # Limit notifications per run (optional)
+    max_notifications_per_run: 10
+
+
+  # ---------------------------------------------------
+  # Example: r/buildapcsales
+  # ---------------------------------------------------
+  - name: "buildapcsales"
+
+    interval: 30
+    keywords:
+      - "SSD"
+      - "4TB"
+      - "GPU"
+      - "4090"
+
+    ignore_title_regex:
+      - "expired"
+      - "OOS"           # Out of stock
+
+    require_title_regex: []
+
+    min_score: 10
+
+    allowed_flairs:
+      - "Deal"
+      - "Sale"
+
+    max_notifications_per_run: 5
