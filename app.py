@@ -4,13 +4,14 @@ import time
 import threading
 from typing import Optional, List
 
-from fastapi import FastAPI, Depends, Query, Request
+from fastapi import FastAPI, Depends, Query, Request, Form
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
+import yaml
 
 from models import SessionLocal, MatchedPost, init_db
-from monitor import run_once, load_config, setup_logger, mark_initial_posts_as_seen
+from monitor import run_once, load_config, setup_logger, mark_initial_posts_as_seen, CONFIG_PATH
 import logging
 
 app = FastAPI(title="Subreddit Watcher", version="1.0.0")
@@ -132,3 +133,65 @@ def index(
         },
     )
 
+
+@app.get("/config", response_class=HTMLResponse)
+def edit_config_page(request: Request):
+    try:
+        text = CONFIG_PATH.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        text = "# config.yaml not found; create it here.\n"
+
+    return templates.TemplateResponse(
+        "config.html",
+        {
+            "request": request,
+            "content": text,
+            "config_path": str(CONFIG_PATH),
+            "error": None,
+            "success": None,
+        },
+    )
+
+
+@app.post("/config", response_class=HTMLResponse)
+def save_config(
+    request: Request,
+    content: str = Form(...),
+):
+    # 1) Validate YAML only
+    try:
+        parsed = yaml.safe_load(content) if content.strip() else {}
+    except yaml.YAMLError as e:
+        return templates.TemplateResponse(
+            "config.html",
+            {
+                "request": request,
+                "content": content,
+                "config_path": str(CONFIG_PATH),
+                "error": f"YAML parse error:\n{e}",
+                "success": None,
+            },
+        )
+
+    # 2) Normalize line endings (optional but nice) and write RAW text
+    cleaned = content.replace("\r\n", "\n").rstrip() + "\n"
+    CONFIG_PATH.write_text(cleaned, encoding="utf-8")
+
+    # 3) Optionally recompute loop interval from new config
+    global LOOP_INTERVAL
+    if isinstance(parsed, dict):
+        try:
+            LOOP_INTERVAL = compute_loop_interval(parsed)
+        except Exception:
+            pass
+
+    return templates.TemplateResponse(
+        "config.html",
+        {
+            "request": request,
+            "content": cleaned,
+            "config_path": str(CONFIG_PATH),
+            "error": None,
+            "success": "Config saved successfully.",
+        },
+    )
