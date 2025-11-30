@@ -1,4 +1,4 @@
-# Subreddit Watcher
+# sub-watcher
 
 A small FastAPI service that monitors configured subreddits and surfaces posts that match your filters. The app runs a background watcher loop and serves a simple HTML dashboard at the root path.
 
